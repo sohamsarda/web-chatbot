@@ -3,6 +3,10 @@ function toggleChat() {
   chat.classList.toggle("active");
 }
 
+function sendQuickMessage(text) {
+  document.getElementById("userInput").value = text;
+  sendMessage();
+}
 function sendMessage() {
   const input = document.getElementById("userInput");
   const message = input.value.trim();
@@ -10,6 +14,14 @@ function sendMessage() {
 
   addMessage("user", message);
   input.value = "";
+
+  // Add "typing..." indicator
+  const chatBox = document.getElementById("chatBox");
+  const typingMsg = document.createElement("div");
+  typingMsg.className = "bot typing";
+  typingMsg.textContent = "Typing...";
+  chatBox.appendChild(typingMsg);
+  chatBox.scrollTop = chatBox.scrollHeight;
 
   fetch("/chat", {
     method: "POST",
@@ -22,12 +34,16 @@ function sendMessage() {
   })
   .then(data => {
     setTimeout(() => {
+      // Remove typing indicator
+      chatBox.removeChild(typingMsg);
+      // Add actual bot reply
       addMessage("bot", data.reply);
-    }, 400);
+    }, 800); // Simulate delay
   })
-  .catch(error => {
-    console.error("Error:", error);
-    addMessage("bot", "Sorry, something went wrong.");
+  .catch(err => {
+    console.error("Error:", err);
+    chatBox.removeChild(typingMsg);
+    addMessage("bot", "Oops! Something went wrong. Please try again.");
   });
 }
 
