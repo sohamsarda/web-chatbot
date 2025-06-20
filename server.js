@@ -1,19 +1,50 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const fs = require("fs");
+const path = require("path");
+
 const app = express();
 const port = 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(__dirname)); // serves index.html
+app.use(express.static(__dirname));
 
-// ✅ Correct POST route
+function saveUser(name, phone) {
+  const contact = { name, phone, time: new Date().toISOString() };
+  const filePath = path.join(__dirname, "contacts.json");
+
+  let data = [];
+  if (fs.existsSync(filePath)) {
+    data = JSON.parse(fs.readFileSync(filePath));
+  }
+
+  data.push(contact);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+}
+
+// 👉 Handle support info submission from frontend
+app.post("/contact", (req, res) => {
+  const { name, phone } = req.body;
+
+  if (!name || !/^[a-zA-Z\s]{2,50}$/.test(name)) {
+    return res.status(400).json({ error: "Invalid name" });
+  }
+  if (!/^\d{10}$/.test(phone)) {
+    return res.status(400).json({ error: "Invalid phone number" });
+  }
+
+  saveUser(name, phone);
+  res.status(200).json({ success: true });
+});
+
+// 👉 Main chatbot response logic
 app.post("/chat", (req, res) => {
-  const msg = req.body.message || "";
+  const msg = req.body.message.trim().toLowerCase();
   const replies = [];
 
-  if (/\b(price|cost|charges|fees|how much|quote|quotation|silver|multi|pricing)\b/i.test(msg)) {
+ if (/\b(price|cost|charges|fees|how much|quote|quotation|silver|multi|pricing)\b/i.test(msg)) {
     replies.push("Thank you for your interest. Our pricing starts at Tally Silver: Rs. 24,500 + GST and Tally Multi: Rs. 67,500 + GST. Please let us know if you would like a formal quotation.");
   }
 
@@ -48,19 +79,13 @@ app.post("/chat", (req, res) => {
   if (/\b(thankyou|bye|goodbye)\b/i.test(msg)) {
 	  replies.push("Thank for Visiting Us...Visit Again");
   }
-
-  // Default fallback
   if (replies.length === 0) {
-    replies.push("Thank you for contacting us. We will get back to you as soon as possible.");
+    replies.push("✅ Thank you for contacting us. We’ll get back to you soon.");
   }
 
-  // Combine all matching replies into one message
-  const reply = replies.join(" ");
-
-  res.json({ reply });
+  res.json({ reply: replies.join(" ") });
 });
 
-
 app.listen(port, () => {
-  console.log(`🤖Chatbot server running at http://localhost:${port}`);
- });
+  console.log(`🤖 Chatbot server running at http://localhost:${port}`);
+});
