@@ -9,9 +9,7 @@
 <body>
 
   <!-- Chat Toggle Button -->
-  <div class="chat-toggle" onclick="toggleChat()">
-    💬
-  </div>
+  <div class="chat-toggle" onclick="toggleChat()">💬</div>
 
   <!-- Chat Widget -->
   <div class="chat-widget" id="chatWidget">
@@ -20,6 +18,17 @@
       <button onclick="toggleChat()">✖</button>
     </div>
     <div id="chatBox" class="chat-box"></div>
+
+    <!-- Quick Reply Buttons -->
+    <div class="quick-replies" id="quickReplies">
+      <button onclick="sendQuickMessage('What is your pricing?')">💰 Pricing</button>
+      <button onclick="sendQuickMessage('What are your working hours?')">🕒 Hours</button>
+      <button onclick="sendQuickMessage('What product do you offer?')">📦 Products</button>
+      <button onclick="sendQuickMessage('How can I contact you?')">📞 Contact</button>
+      <button onclick="sendQuickMessage('Where is your office loacted?')">🏢 Office</button>
+
+    </div>
+
     <div class="input-area">
       <input type="text" id="userInput" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendMessage()" />
       <button onclick="sendMessage()">Send</button>

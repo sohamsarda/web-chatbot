@@ -13,7 +13,7 @@ app.post("/chat", (req, res) => {
   const msg = req.body.message || "";
   const replies = [];
 
-  if (/\b(price|cost|charges|fees|how much|quote|quotation|silver|multi)\b/i.test(msg)) {
+  if (/\b(price|cost|charges|fees|how much|quote|quotation|silver|multi|pricing)\b/i.test(msg)) {
     replies.push("Thank you for your interest. Our pricing starts at Tally Silver: Rs. 24,500 + GST and Tally Multi: Rs. 67,500 + GST. Please let us know if you would like a formal quotation.");
   }
 
@@ -44,6 +44,10 @@ app.post("/chat", (req, res) => {
   if (/\b(contact|email|phone|call|reach you|talk to)\b/i.test(msg)) {
     replies.push("You can reach us at sohamsardawork@gmail.com");
   }
+  
+  if (/\b(thankyou|bye|goodbye)\b/i.test(msg)) {
+	  replies.push("Thank for Visiting Us...Visit Again");
+  }
 
   // Default fallback
   if (replies.length === 0) {
@@ -59,4 +63,4 @@ app.post("/chat", (req, res) => {
 
 app.listen(port, () => {
   console.log(`🤖Chatbot server running at http://localhost:${port}`);
-});
+ });
