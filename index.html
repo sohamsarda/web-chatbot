@@ -17,6 +17,7 @@
       <span>🤖 Website Assistant</span>
       <button onclick="toggleChat()">✖</button>
     </div>
+
     <div id="chatBox" class="chat-box"></div>
 
     <!-- Quick Reply Buttons -->
@@ -26,9 +27,14 @@
       <button onclick="sendQuickMessage('What product do you offer?')">📦 Products</button>
       <button onclick="sendQuickMessage('How can I contact you?')">📞 Contact</button>
       <button onclick="sendQuickMessage('Where is your office loacted?')">🏢 Office</button>
-
     </div>
 
+    <!-- Support Button -->
+    <div class="support-button-wrapper">
+      <button id="supportBtn" class="support-button">💬 Need Support?</button>
+    </div>
+
+    <!-- Chat Input Area -->
     <div class="input-area">
       <input type="text" id="userInput" placeholder="Type your message..." onkeydown="if(event.key==='Enter') sendMessage()" />
       <button onclick="sendMessage()">Send</button>
