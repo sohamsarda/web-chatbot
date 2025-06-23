@@ -38,16 +38,14 @@ function sendMessage() {
   input.value = "";
 
   const chatBox = document.getElementById("chatBox");
-  const typingMsg = document.createElement("div");
-  typingMsg.className = "bot typing";
-  typingMsg.textContent = "Typing...";
-  chatBox.appendChild(typingMsg);
+  const spinner = document.getElementById("loadingSpinner");
+  spinner.style.display = "flex";
   chatBox.scrollTop = chatBox.scrollHeight;
 
   // Contact Info Flow (only triggered after clicking support button)
   if (contactStage === 1) {
     setTimeout(() => {
-      chatBox.removeChild(typingMsg);
+      spinner.style.display = "none";
       tempName = message;
       addMessage("bot", `Thanks, ${tempName}! Can you also share your phone number?`);
       contactStage = 2;
@@ -57,17 +55,14 @@ function sendMessage() {
 
   if (contactStage === 2) {
     setTimeout(() => {
-      chatBox.removeChild(typingMsg);
+      spinner.style.display = "none";
       tempPhone = message;
-
-      // Send name and phone to backend
       fetch("/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: tempName, phone: tempPhone })
       }).catch(err => console.error("Failed to save contact:", err));
-
-      addMessage("bot", `✅ Great, ${tempName}! We’ll contact you at ${tempPhone}.`);
+      addMessage("bot", `✅ Great, ${tempName}! We'll contact you at ${tempPhone}.`);
       contactStage = 0;
     }, 600);
     return;
@@ -85,23 +80,35 @@ function sendMessage() {
     })
     .then(data => {
       setTimeout(() => {
-        chatBox.removeChild(typingMsg);
+        spinner.style.display = "none";
         addMessage("bot", data.reply);
       }, 800);
     })
     .catch(err => {
       console.error("Error:", err);
-      chatBox.removeChild(typingMsg);
+      spinner.style.display = "none";
       addMessage("bot", "Oops! Something went wrong. Please try again.");
     });
 }
 
 function addMessage(sender, text) {
   const chatBox = document.getElementById("chatBox");
-  const msg = document.createElement("div");
-  msg.className = sender;
-  msg.textContent = text;
-  chatBox.appendChild(msg);
+  const row = document.createElement("div");
+  row.className = `message-row ${sender}`;
+  const avatar = document.createElement("div");
+  avatar.className = "avatar";
+  avatar.textContent = sender === "user" ? "🧑" : "🤖";
+  const bubble = document.createElement("div");
+  bubble.className = `bubble ${sender}`;
+  bubble.textContent = text;
+  if (sender === "user") {
+    row.appendChild(bubble);
+    row.appendChild(avatar);
+  } else {
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+  }
+  chatBox.appendChild(row);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
