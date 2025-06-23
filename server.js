@@ -34,6 +34,9 @@ app.post("/contact", (req, res) => {
   if (!/^\d{10}$/.test(phone)) {
     return res.status(400).json({ error: "Invalid phone number" });
   }
+  
+  console.log(`📞 Contact API Hit - Name: ${name}, Phone: ${phone}`);
+  
 
   saveUser(name, phone);
   res.status(200).json({ success: true });
