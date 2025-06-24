@@ -13,16 +13,25 @@ app.use(express.static(__dirname));
 
 function saveUser(name, phone) {
   const contact = { name, phone, time: new Date().toISOString() };
+  console.log("📩 New Contact Entry:", contact); // Log always
+
   const filePath = path.join(__dirname, "contacts.json");
 
-  let data = [];
-  if (fs.existsSync(filePath)) {
-    data = JSON.parse(fs.readFileSync(filePath));
-  }
+  try {
+    let data = [];
 
-  data.push(contact);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    // Read existing data if file exists
+    if (fs.existsSync(filePath)) {
+      data = JSON.parse(fs.readFileSync(filePath));
+    }
+
+    data.push(contact);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error("❌ Failed to write to contacts.json:", error.message);
+  }
 }
+
 
 // 👉 Handle support info submission from frontend
 app.post("/contact", (req, res) => {
