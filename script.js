@@ -2,6 +2,11 @@ let contactStage = 0;
 let tempName = "";
 let tempPhone = "";
 
+// ✅ Dynamically set base API URL based on environment
+const BASE_URL = location.hostname === "localhost"
+  ? "http://localhost:3000"
+  : "https://web-chatbot-cmmc.onrender.com";
+
 function toggleChat() {
   const chat = document.getElementById("chatWidget");
   chat.classList.toggle("active");
@@ -42,7 +47,7 @@ function sendMessage() {
   spinner.style.display = "flex";
   chatBox.scrollTop = chatBox.scrollHeight;
 
-  // Contact Info Flow (only triggered after clicking support button)
+  // 👉 Step 1: Ask for name
   if (contactStage === 1) {
     setTimeout(() => {
       spinner.style.display = "none";
@@ -53,23 +58,33 @@ function sendMessage() {
     return;
   }
 
+  // 👉 Step 2: Ask for phone, then submit to backend
   if (contactStage === 2) {
     setTimeout(() => {
       spinner.style.display = "none";
       tempPhone = message;
-      fetch("/contact", {
+
+      fetch(`${BASE_URL}/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: tempName, phone: tempPhone })
-      }).catch(err => console.error("Failed to save contact:", err));
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to save contact info.");
+        })
+        .catch(err => {
+          console.error("❌ Failed to save contact:", err);
+          addMessage("bot", "⚠️ There was a problem saving your details. Please try again later.");
+        });
+
       addMessage("bot", `✅ Great, ${tempName}! We'll contact you at ${tempPhone}.`);
       contactStage = 0;
     }, 600);
     return;
   }
 
-  // Regular chatbot flow
-  fetch("/chat", {
+  // 👉 Regular chatbot conversation
+  fetch(`${BASE_URL}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message })
@@ -85,9 +100,9 @@ function sendMessage() {
       }, 800);
     })
     .catch(err => {
-      console.error("Error:", err);
+      console.error("💥 Error:", err);
       spinner.style.display = "none";
-      addMessage("bot", "Oops! Something went wrong. Please try again.");
+      addMessage("bot", "⚠️ Oops! Something went wrong. Please try again.");
     });
 }
 
@@ -112,7 +127,5 @@ function addMessage(sender, text) {
   chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// Support button event listener
-document.getElementById("supportBtn").addEventListener("click", function () {
-  startSupportFlow();
-});
+// 👇 Support button event
+document.getElementById("supportBtn").addEventListener("click", startSupportFlow);
