@@ -88,6 +88,10 @@ app.post("/chat", (req, res) => {
     replies.push("You can reach us at sohamsardawork@gmail.com");
   }
   
+  if (/\b(update|renew|updated|upgrade|renewal)\b/i.test(msg)) {
+    replies.push("Tally Silver renewal starts at Rs.4500 + GST and Tally Multi renewal Starts at Rs.13500 + GST .");
+  }
+  
   if (/\b(thankyou|bye|goodbye)\b/i.test(msg)) {
 	  replies.push("Thank for Visiting Us...Visit Again");
   }
